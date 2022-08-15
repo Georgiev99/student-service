@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service
 public class StudentService {
@@ -32,12 +33,12 @@ public class StudentService {
             student.setTIN((mapOfStudentData.get("TIN")));
             Speciality speciality = specialityRepository.findByName(mapOfStudentData.get("speciality"));
             if (speciality == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Speciality not found");
+              throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Speciality not found");
             }
             if (studentRepository.findBySpeciality(speciality.getName()).size() >= speciality.getCapacity()){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Speciality capacity is reached!");
             }
-            return createEmail(speciality,student);
+            return createEmailAndFacultyNumber(speciality,student);
 
             // TODO  generate faculty number based on random numbers check if it exists already if not,use it
             //TODO save the record in the database
@@ -47,12 +48,26 @@ public class StudentService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Input");
     }
 
-    private Student createEmail(Speciality speciality , Student student){
+    private Student createEmailAndFacultyNumber(Speciality speciality , Student student){
         int numberForEmail = studentRepository.findBySpeciality(speciality.getName()).size()+1;
         String email = student.getFirstName().toLowerCase()+"."+student.getLastName()
                 .toLowerCase()+numberForEmail+"@"+"technicaluni.com";
         student.setEmail(email);
-        // lll
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder();
+        String facultyNumberDigits  = "0123456789";
+        while (true) {
+            for (int i = 0; i < 8; i++) {
+                sb.append(facultyNumberDigits.charAt(rnd.nextInt(facultyNumberDigits.length())));
+            }
+          Student  studentByFacultyNumber = studentRepository.findByFacultyNumber(sb.toString());
+            if (studentByFacultyNumber == null){
+                break;
+            }
+            sb = new StringBuilder();
+        }
+        student.setFacultyNumber(sb.toString());
+        studentRepository.save(student);
         return student;
 
    }
