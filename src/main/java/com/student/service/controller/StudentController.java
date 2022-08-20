@@ -7,6 +7,7 @@ import com.student.service.repository.SpecialityPlanRepository;
 import com.student.service.repository.SpecialityRepository;
 import com.student.service.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,11 +28,15 @@ public class StudentController {
     private SpecialityPlanRepository specialityPlanRepository;
 
     @PostMapping("/create")
-    public Student addStudent(@RequestBody Map<String,String> json){
-       return studentService.createStudent(json);
+    public ResponseEntity<Map<String,Object>> addStudent(@RequestBody Map<String,String> json){
+       Map<String,Object> mapOfResultFromCreation = studentService.createStudent(json);
+       if (mapOfResultFromCreation.containsKey("Error")){
+           return ResponseEntity.badRequest().body(mapOfResultFromCreation);
+       }
+       return ResponseEntity.ok(mapOfResultFromCreation);
     }
 
-
+    
     @GetMapping("/test")
     public List<Speciality> test(){
         return specialityRepository.findAll();
