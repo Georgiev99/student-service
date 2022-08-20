@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Struct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class StudentService {
@@ -87,10 +84,16 @@ public class StudentService {
 
     }
 
-    public List<Student> getAllStudents() {
-
-        // TODO  extend functionality and add different functions (filter for degree(bachelor/master), speciality etc.
-        return studentRepository.findAll();
+    public List<Student> getAllStudents(String degree) {
+        List<Student> listOfStudents  = new ArrayList<>();
+        List<Student> listWithAll = studentRepository.findAll();
+        for (int i =0; i < listWithAll.size();i++){
+            Speciality speciality = specialityRepository.findByName(listWithAll.get(i).getSpeciality());
+            if (speciality.getDegree().equals(degree)){
+                listOfStudents.add(listWithAll.get(i));
+            }
+        }
+        return listOfStudents;
     }
 
     // add function to show all grades and subjects that a student has based on his faculty number and TIN

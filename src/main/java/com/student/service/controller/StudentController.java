@@ -36,9 +36,10 @@ public class StudentController {
        return ResponseEntity.ok(mapOfResultFromCreation);
     }
 
-    
-    @GetMapping("/test")
-    public List<Speciality> test(){
-        return specialityRepository.findAll();
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Student>>getAllStudentsByDegree(@RequestParam String degree){
+        return ResponseEntity.ok(studentService.getAllStudents(degree));
     }
+
 }
