@@ -1,7 +1,9 @@
 package com.student.service.service;
 
+import com.student.service.entity.Grades;
 import com.student.service.entity.Speciality;
 import com.student.service.entity.Student;
+import com.student.service.repository.GradeRepository;
 import com.student.service.repository.SpecialityRepository;
 import com.student.service.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private GradeRepository gradeRepository;
 
     @Autowired
     private SpecialityRepository specialityRepository;
@@ -94,6 +99,33 @@ public class StudentService {
             }
         }
         return listOfStudents;
+    }
+
+    public Map<String,Object> getStudentInformation(String TIN, String facultyNumber){
+        Student student =  studentRepository.findByFacultyNumber(facultyNumber);
+        Map<String,Object> errorResponse  = new HashMap<>();
+        if (student == null){
+            errorResponse.put("Грешка", "не е намерен студент с този факултетен номер");
+            return errorResponse;
+        }
+        if (student.getTIN().equals(TIN)){
+            Map<String,Object> response  = new HashMap<>();
+            Map<String,Object> mapOfSubjectAndGrade = new HashMap<>();
+            List<Grades> listOfGrades  = gradeRepository.findByStudentFacultyNumber(facultyNumber);
+            for (int i = 0; i< listOfGrades.size();i++){
+                mapOfSubjectAndGrade.put(listOfGrades.get(i).getSubject(),
+                        listOfGrades.get(i).getGrade());
+            }
+            mapOfSubjectAndGrade.put("Специалност",student.getSpeciality());
+            Speciality speciality = specialityRepository.findByName(student.getSpeciality());
+            mapOfSubjectAndGrade.put("Степен на образование",speciality.getDegree());
+            response.put("Студент с факултетен номер "+facultyNumber,mapOfSubjectAndGrade);
+            return response;
+        } else {
+            errorResponse.put("Грешка","Грешно ЕГН");
+            return errorResponse;
+        }
+
     }
 
     // add function to show all grades and subjects that a student has based on his faculty number and TIN

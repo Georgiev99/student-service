@@ -42,4 +42,12 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAllStudents(degree));
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<Map<String,Object>> getStudentData(@RequestParam String TIN,@RequestParam String facultyNumber){
+        if (TIN != null && facultyNumber != null){
+           return ResponseEntity.ok(studentService.getStudentInformation(TIN,facultyNumber));
+        }
+        return ResponseEntity.badRequest().body(null);
+    }
+
 }
