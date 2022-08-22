@@ -127,7 +127,5 @@ public class StudentService {
         }
 
     }
-
-    // add function to show all grades and subjects that a student has based on his faculty number and TIN
-
+    
 }
