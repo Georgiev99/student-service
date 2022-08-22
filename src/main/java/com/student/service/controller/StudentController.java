@@ -50,4 +50,13 @@ public class StudentController {
         return ResponseEntity.badRequest().body(null);
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String,String>> deleteStudent(@RequestParam String facultyNumber){
+        Map<String,String> response = studentService.deleteStudent(facultyNumber);
+        if (response.containsKey("Грешка")){
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
 }

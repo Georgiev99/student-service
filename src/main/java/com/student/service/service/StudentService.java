@@ -127,5 +127,17 @@ public class StudentService {
         }
 
     }
-    
+
+    public Map<String, String> deleteStudent(String facultyNumber){
+        Student student = studentRepository.findByFacultyNumber(facultyNumber);
+        Map<String,String> response  = new HashMap<>();
+        if (student == null){
+            response.put("Грешка", "Студент с факултетен номер "+facultyNumber+" не  е намерен");
+        } else {
+            studentRepository.delete(student);
+            response.put("Резултат", "Успешно изтрит");
+        }
+        return response;
+    }
+
 }
