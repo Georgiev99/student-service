@@ -1,13 +1,15 @@
 package com.student.service.entity;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "speciality_plan")
 public class SpecialityPlan {
 
     @Id
+    @Column(name = "id")
+    private int id;
+
     @Column(name = "faculty_name")
     private String facultyName;
 
@@ -16,6 +18,9 @@ public class SpecialityPlan {
 
     @Column(name = "subjects")
     private String subjects;
+
+
+
 
     public SpecialityPlan() {
 

@@ -22,6 +22,9 @@ public class Speciality {
     @Column(name = "capacity")
     private int capacity;
 
+    @Column(name = "plan")
+    public int plan;
+
     public Speciality(){
 
     }

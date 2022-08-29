@@ -26,7 +26,7 @@ public class StudentService {
     @Autowired
     private SpecialityRepository specialityRepository;
 
-    public Map<String,Object> createStudent(Map<String, String> mapOfStudentData) {
+    public Map<String, Object> createStudent(Map<String, String> mapOfStudentData) {
         Map<String, Object> responseForBadRequest = new HashMap<>();
         if (mapOfStudentData.containsKey("firstName") && mapOfStudentData.containsKey("lastName")
                 && mapOfStudentData.containsKey("speciality") && mapOfStudentData.containsKey("TIN")
@@ -63,76 +63,77 @@ public class StudentService {
         return responseForBadRequest;
     }
 
-    private Map<String,Object> createEmailAndFacultyNumber(Speciality speciality, Student student) {
+    private Map<String, Object> createEmailAndFacultyNumber(Speciality speciality, Student student) {
         int numberForEmail = studentRepository.findBySpeciality(speciality.getName()).size() + 1;
         String email = student.getFirstName().toLowerCase() + "." + student.getLastName()
-                .toLowerCase() + numberForEmail + "@" + "technicaluni.com";
+                .toLowerCase() + numberForEmail + "@" + "tu-sofia.com";
         student.setEmail(email);
         Random rnd = new Random();
         StringBuilder sb = new StringBuilder();
         String facultyNumberDigits = "0123456789";
         while (true) {
-            for (int i = 0; i < 8; i++) {
+            if (sb.length() < 8) {
                 sb.append(facultyNumberDigits.charAt(rnd.nextInt(facultyNumberDigits.length())));
+            } else {
+                Student studentByFacultyNumber = studentRepository.findByFacultyNumber(sb.toString());
+                if (studentByFacultyNumber == null) {
+                    break;
+                }
+                sb = new StringBuilder();
             }
-            Student studentByFacultyNumber = studentRepository.findByFacultyNumber(sb.toString());
-            if (studentByFacultyNumber == null) {
-                break;
-            }
-            sb = new StringBuilder();
         }
         student.setFacultyNumber(sb.toString());
         studentRepository.save(student);
-        Map<String,Object> result  = new HashMap<>();
-        result.put("Created",student.toString());
+        Map<String, Object> result = new HashMap<>();
+        result.put("Created", student.getEmail() + " "+ student.getTIN());
         return result;
 
     }
 
     public List<Student> getAllStudents(String degree) {
-        List<Student> listOfStudents  = new ArrayList<>();
+        List<Student> listOfStudents = new ArrayList<>();
         List<Student> listWithAll = studentRepository.findAll();
-        for (int i =0; i < listWithAll.size();i++){
+        for (int i = 0; i < listWithAll.size(); i++) {
             Speciality speciality = specialityRepository.findByName(listWithAll.get(i).getSpeciality());
-            if (speciality.getDegree().equals(degree)){
+            if (speciality.getDegree().equals(degree)) {
                 listOfStudents.add(listWithAll.get(i));
             }
         }
         return listOfStudents;
     }
 
-    public Map<String,Object> getStudentInformation(String TIN, String facultyNumber){
-        Student student =  studentRepository.findByFacultyNumber(facultyNumber);
-        Map<String,Object> errorResponse  = new HashMap<>();
-        if (student == null){
+    public Map<String, Object> getStudentInformation(String TIN, String facultyNumber) {
+        Student student = studentRepository.findByFacultyNumber(facultyNumber);
+        Map<String, Object> errorResponse = new HashMap<>();
+        if (student == null) {
             errorResponse.put("Грешка", "не е намерен студент с този факултетен номер");
             return errorResponse;
         }
-        if (student.getTIN().equals(TIN)){
-            Map<String,Object> response  = new HashMap<>();
-            Map<String,Object> mapOfSubjectAndGrade = new HashMap<>();
-            List<Grades> listOfGrades  = gradeRepository.findByStudentFacultyNumber(facultyNumber);
-            for (int i = 0; i< listOfGrades.size();i++){
-                mapOfSubjectAndGrade.put(listOfGrades.get(i).getSubject(),
-                        listOfGrades.get(i).getGrade());
+        if (student.getTIN().equals(TIN)) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, Object> mapOfSubjectAndGrade = new HashMap<>();
+            List<Grades> listOfGrades = gradeRepository.findByStudentFacultyNumber(facultyNumber);
+            for (Grades i : listOfGrades) {
+                mapOfSubjectAndGrade.put(i.getSubject(),
+                        i.getGrade());
             }
-            mapOfSubjectAndGrade.put("Специалност",student.getSpeciality());
+            mapOfSubjectAndGrade.put("Специалност", student.getSpeciality());
             Speciality speciality = specialityRepository.findByName(student.getSpeciality());
-            mapOfSubjectAndGrade.put("Степен на образование",speciality.getDegree());
-            response.put("Студент с факултетен номер "+facultyNumber,mapOfSubjectAndGrade);
+            mapOfSubjectAndGrade.put("Степен на образование", speciality.getDegree());
+            response.put("Студент с факултетен номер " + facultyNumber, mapOfSubjectAndGrade);
             return response;
         } else {
-            errorResponse.put("Грешка","Грешно ЕГН");
+            errorResponse.put("Грешка", "Грешно ЕГН");
             return errorResponse;
         }
 
     }
 
-    public Map<String, String> deleteStudent(String facultyNumber){
+    public Map<String, String> deleteStudent(String facultyNumber) {
         Student student = studentRepository.findByFacultyNumber(facultyNumber);
-        Map<String,String> response  = new HashMap<>();
-        if (student == null){
-            response.put("Грешка", "Студент с факултетен номер "+facultyNumber+" не  е намерен");
+        Map<String, String> response = new HashMap<>();
+        if (student == null) {
+            response.put("Грешка", "Студент с факултетен номер " + facultyNumber + " не  е намерен");
         } else {
             studentRepository.delete(student);
             response.put("Резултат", "Успешно изтрит");
