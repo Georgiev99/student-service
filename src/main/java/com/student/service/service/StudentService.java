@@ -1,8 +1,10 @@
 package com.student.service.service;
 
+import com.student.service.entity.Admin;
 import com.student.service.entity.Grades;
 import com.student.service.entity.Speciality;
 import com.student.service.entity.Student;
+import com.student.service.repository.AdminRepository;
 import com.student.service.repository.GradeRepository;
 import com.student.service.repository.SpecialityRepository;
 import com.student.service.repository.StudentRepository;
@@ -25,6 +27,9 @@ public class StudentService {
 
     @Autowired
     private SpecialityRepository specialityRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     public Map<String, Object> createStudent(Map<String, String> mapOfStudentData) {
         Map<String, Object> responseForBadRequest = new HashMap<>();
@@ -141,4 +146,7 @@ public class StudentService {
         return response;
     }
 
+    public List<Admin> getAdmins(){
+        return adminRepository.findAll();
+    }
 }

@@ -1,6 +1,8 @@
 package com.student.service.config;
 
 
+import com.student.service.entity.Admin;
+import com.student.service.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,18 +14,25 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+import javax.swing.text.AbstractDocument;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class BaseConfig extends WebSecurityConfigurerAdapter {
 
-
+    @Autowired
+    private StudentService studentService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
-        auth.inMemoryAuthentication()
-                .withUser("user1").password(passwordEncoder().encode("user1Pass"))
-                .authorities("ROLE_USER");
+        List<Admin> admins = studentService.getAdmins();
+        for (Admin  admin : admins) {
+            auth.inMemoryAuthentication()
+                    .withUser(admin.getEmail()).password(passwordEncoder().encode(admin
+            .getPass()))
+                    .authorities("ROLE_USER");
+        }
     }
 
     @Override
