@@ -59,10 +59,6 @@ public class StudentService {
             }
             return createEmailAndFacultyNumber(speciality, student);
 
-            // TODO  generate faculty number based on random numbers check if it exists already if not,use it
-            //TODO save the record in the database
-
-
         }
         responseForBadRequest.put("Error", "Wrong input");
         return responseForBadRequest;

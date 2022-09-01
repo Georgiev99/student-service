@@ -72,9 +72,12 @@
 					</execution>
 				</executions>
 				<configuration>
-					<repository>dailycodebuffer/dockerpublish</repository>
+					<repository>georgievv99/student-service</repository>
 					<tag>${project.version}</tag>
 					<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+					<buildArgs>
+						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
 				</configuration>
 				<dependencies>
 					<!-- To make this work on JDK 9+ -->
@@ -86,7 +89,6 @@
 				</dependencies>
 			</plugin>
 		</plugins>
-		<finalName>student-service</finalName>
 	</build>
 
 </project>
