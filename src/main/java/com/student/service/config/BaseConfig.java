@@ -50,7 +50,7 @@ public class BaseConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/api/student/info").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+                .antMatchers("/api/student/info").permitAll()
                 .antMatchers("/api/student/all").access("hasRole('ROLE_ADMIN')")
                 .antMatchers("/api/student/create").access("hasRole('ROLE_ADMIN')")
                 .antMatchers("/api/student/delete").access("hasRole('ROLE_ADMIN')")
