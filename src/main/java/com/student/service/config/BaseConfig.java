@@ -26,8 +26,6 @@ public class BaseConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private StudentService studentService;
 
-    @Autowired
-    private StudentRepository studentRepository;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -37,13 +35,6 @@ public class BaseConfig extends WebSecurityConfigurerAdapter {
                     .withUser(admin.getEmail()).password(passwordEncoder().encode(admin
             .getPass()))
                     .authorities("ROLE_ADMIN");
-        }
-        List<Student> studentList = studentRepository.findAll();
-        for (Student student : studentList){
-            auth.inMemoryAuthentication()
-                    .withUser(student.getFacultyNumber()).password(passwordEncoder().encode(student
-                    .getTIN()))
-                    .authorities("ROLE_USER");
         }
     }
 
