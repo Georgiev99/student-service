@@ -26,8 +26,8 @@ public class Student {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "tin")
-    private String TIN;
+    @Column(name = "egn")
+    private String EGN;
 
 
     public Student(){
@@ -36,21 +36,21 @@ public class Student {
 
 
 
-    public Student(String facultyNumber, String firstName, String lastName, String speciality,String email,String TIN) {
+    public Student(String facultyNumber, String firstName, String lastName, String speciality,String email,String EGN) {
         this.facultyNumber = facultyNumber;
         this.firstName = firstName;
         this.lastName = lastName;
         this.speciality = speciality;
         this.email = email;
-        this.TIN = TIN;
+        this.EGN = EGN;
     }
 
-    public String getTIN() {
-        return TIN;
+    public String getEGN() {
+        return EGN;
     }
 
-    public void setTIN(String TIN) {
-        this.TIN = TIN;
+    public void setEGN(String EGN) {
+        this.EGN = EGN;
     }
 
     public String getEmail() {

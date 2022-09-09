@@ -1,57 +1,35 @@
 package com.student.service.config;
 
-
 import com.student.service.entity.Admin;
-import com.student.service.entity.Student;
-import com.student.service.repository.StudentRepository;
 import com.student.service.service.StudentService;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
-import javax.swing.text.AbstractDocument;
 import java.util.List;
 
-@Configuration
-@EnableWebSecurity
-public class BaseConfig extends WebSecurityConfigurerAdapter {
+@Component
+public class BaseConfig {
 
     @Autowired
     private StudentService studentService;
 
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        List<Admin> admins = studentService.getAdmins();
-        for (Admin  admin : admins) {
-            auth.inMemoryAuthentication()
-                    .withUser(admin.getEmail()).password(passwordEncoder().encode(admin
-            .getPass()))
-                    .authorities("ROLE_ADMIN");
+    public boolean authorize(String authenticationHeader){
+        if (authenticationHeader.isEmpty() || authenticationHeader == null || authenticationHeader.length()< 6){
+            return false;
         }
+        String pair = new String(Base64.decodeBase64(authenticationHeader.substring(6)));
+        System.out.println(pair);
+        String userName = pair.split(":")[0];
+        String password = pair.split(":")[1];
+        List<Admin> list = studentService.getAdmins();
+        for (Admin admin : list) {
+            if (admin.getEmail().equals(userName) && admin.getPass().equals(password)){
+                return true;
+            }
     }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/api/student/info").permitAll()
-                .antMatchers("/api/student/all").access("hasRole('ROLE_ADMIN')")
-                .antMatchers("/api/student/create").access("hasRole('ROLE_ADMIN')")
-                .antMatchers("/api/student/delete").access("hasRole('ROLE_ADMIN')")
-    .anyRequest().authenticated()
-                .and()
-                .httpBasic();
-    }
-
-    @Bean
-  public  PasswordEncoder passwordEncoder(){
-        return  new BCryptPasswordEncoder();
-    }
+        return false;
+}
 }

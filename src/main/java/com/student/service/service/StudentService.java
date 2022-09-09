@@ -9,11 +9,8 @@ import com.student.service.repository.GradeRepository;
 import com.student.service.repository.SpecialityRepository;
 import com.student.service.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Struct;
 import java.util.*;
 
 @Service
@@ -34,12 +31,12 @@ public class StudentService {
     public Map<String, Object> createStudent(Map<String, String> mapOfStudentData) {
         Map<String, Object> responseForBadRequest = new HashMap<>();
         if (mapOfStudentData.containsKey("firstName") && mapOfStudentData.containsKey("lastName")
-                && mapOfStudentData.containsKey("speciality") && mapOfStudentData.containsKey("TIN")
+                && mapOfStudentData.containsKey("speciality") && mapOfStudentData.containsKey("EGN")
         ) {
             List<Student> listOfStudents = studentRepository.findAll();
             for (int i = 0; i < listOfStudents.size(); i++) {
-                if (listOfStudents.get(i).getTIN().equals(mapOfStudentData.get("TIN"))) {
-                    responseForBadRequest.put("Error", "Student exists");
+                if (listOfStudents.get(i).getEGN().equals(mapOfStudentData.get("EGN"))) {
+                    responseForBadRequest.put("Грешка", "Студента е записан");
                     return responseForBadRequest;
                 }
             }
@@ -47,20 +44,20 @@ public class StudentService {
             student.setFirstName(mapOfStudentData.get("firstName"));
             student.setLastName(mapOfStudentData.get("lastName"));
             student.setSpeciality(mapOfStudentData.get("speciality"));
-            student.setTIN((mapOfStudentData.get("TIN")));
+            student.setEGN((mapOfStudentData.get("EGN")));
             Speciality speciality = specialityRepository.findByName(mapOfStudentData.get("speciality"));
             if (speciality == null) {
-                responseForBadRequest.put("Error", "Speciality not found");
+                responseForBadRequest.put("Грешка", "Не е намерена такава специалност");
                 return responseForBadRequest;
             }
             if (studentRepository.findBySpeciality(speciality.getName()).size() >= speciality.getCapacity()) {
-                responseForBadRequest.put("Error", "Speciality capacity reached");
+                responseForBadRequest.put("Грешка", "Капацитета на специалността е достигнат");
                 return responseForBadRequest;
             }
             return createEmailAndFacultyNumber(speciality, student);
 
         }
-        responseForBadRequest.put("Error", "Wrong input");
+        responseForBadRequest.put("Грешка", "Грешни входни данни");
         return responseForBadRequest;
     }
 
@@ -86,7 +83,7 @@ public class StudentService {
         student.setFacultyNumber(sb.toString());
         studentRepository.save(student);
         Map<String, Object> result = new HashMap<>();
-        result.put("Created", student.getEmail() + " "+ student.getTIN());
+        result.put("Записан успешно", student.getEmail() + " "+ student.getEGN());
         return result;
 
     }
@@ -103,14 +100,14 @@ public class StudentService {
         return listOfStudents;
     }
 
-    public Map<String, Object> getStudentInformation(String TIN, String facultyNumber) {
+    public Map<String, Object> getStudentInformation(String EGN, String facultyNumber) {
         Student student = studentRepository.findByFacultyNumber(facultyNumber);
         Map<String, Object> errorResponse = new HashMap<>();
         if (student == null) {
             errorResponse.put("Грешка", "не е намерен студент с този факултетен номер");
             return errorResponse;
         }
-        if (student.getTIN().equals(TIN)) {
+        if (student.getEGN().equals(EGN)) {
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> mapOfSubjectAndGrade = new HashMap<>();
             List<Grades> listOfGrades = gradeRepository.findByStudentFacultyNumber(facultyNumber);
@@ -119,6 +116,7 @@ public class StudentService {
                         i.getGrade());
             }
             mapOfSubjectAndGrade.put("Специалност", student.getSpeciality());
+            mapOfSubjectAndGrade.put("Мейл", student.getEmail());
             Speciality speciality = specialityRepository.findByName(student.getSpeciality());
             mapOfSubjectAndGrade.put("Степен на образование", speciality.getDegree());
             response.put("Студент с факултетен номер " + facultyNumber, mapOfSubjectAndGrade);
@@ -128,18 +126,6 @@ public class StudentService {
             return errorResponse;
         }
 
-    }
-
-    public Map<String, String> deleteStudent(String facultyNumber) {
-        Student student = studentRepository.findByFacultyNumber(facultyNumber);
-        Map<String, String> response = new HashMap<>();
-        if (student == null) {
-            response.put("Грешка", "Студент с факултетен номер " + facultyNumber + " не  е намерен");
-        } else {
-            studentRepository.delete(student);
-            response.put("Резултат", "Успешно изтрит");
-        }
-        return response;
     }
 
     public List<Admin> getAdmins(){
