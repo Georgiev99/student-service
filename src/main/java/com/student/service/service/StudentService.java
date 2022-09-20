@@ -35,7 +35,7 @@ public class StudentService {
         ) {
             List<Student> listOfStudents = studentRepository.findAll();
             for (Student student : listOfStudents){
-                if (student.getEGN().equals("EGN")) {
+                if (student.getEGN().equals(mapOfStudentData.get("EGN"))) {
                     responseForBadRequest.put("Грешка", "Студента вече е записан");
                     return responseForBadRequest;
                 }
