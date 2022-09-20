@@ -34,9 +34,9 @@ public class StudentService {
                 && mapOfStudentData.containsKey("speciality") && mapOfStudentData.containsKey("EGN")
         ) {
             List<Student> listOfStudents = studentRepository.findAll();
-            for (int i = 0; i < listOfStudents.size(); i++) {
-                if (listOfStudents.get(i).getEGN().equals(mapOfStudentData.get("EGN"))) {
-                    responseForBadRequest.put("Грешка", "Студента е записан");
+            for (Student student : listOfStudents){
+                if (student.getEGN().equals("EGN")) {
+                    responseForBadRequest.put("Грешка", "Студента вече е записан");
                     return responseForBadRequest;
                 }
             }
@@ -91,11 +91,11 @@ public class StudentService {
     public List<Student> getAllStudents(String degree) {
         List<Student> listOfStudents = new ArrayList<>();
         List<Student> listWithAll = studentRepository.findAll();
-        for (int i = 0; i < listWithAll.size(); i++) {
-            Speciality speciality = specialityRepository.findByName(listWithAll.get(i).getSpeciality());
-            if (speciality.getDegree().equals(degree)) {
-                listOfStudents.add(listWithAll.get(i));
-            }
+        for (Student student : listWithAll){
+            Speciality studentSpeciality = specialityRepository.findByName(student.getSpeciality());
+            if (studentSpeciality.getDegree().equals(degree)){
+                listOfStudents.add(student);
+        }
         }
         return listOfStudents;
     }
